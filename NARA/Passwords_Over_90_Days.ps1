@@ -1,0 +1,1 @@
+﻿Get-ADUser -Filter {(Enabled -eq $True) -and (Name -notlike '*_*')} -Properties Enabled,PasswordLastSet,DisplayName,EmailAddress | Where-Object {$_.PasswordLastSet -lt (Get-Date).adddays(-90)} | select DisplayName,SamAccountName,EmailAddress,PasswordLastSet | export-csv -Path "C:\Temp\Password_Not_Changed.csv" -NoTypeInformation -Append
