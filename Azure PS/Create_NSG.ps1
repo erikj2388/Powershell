@@ -1,20 +1,34 @@
 <#
 Powershell script for creating new NSGs with the baseline rules.
 This does not include the Deny rules 4095 and 4096.
-
-Connect using Az-Connect. Verify subscription with Get-AzContext. Use Set AZ-Context -id "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" to set your context to the desired subscription
 #>
 
-$hostVM =  #IP Address of the VM
+# Install the Azure Az Powershell Module if not already installed
+# Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force
 
-$nsgName =  #Name of the new NSG
+# Connect using Az-Connect
+Az-Connect
 
-$bastionSubnet = #IP range of Bastion Subnet
+# Verify subscription with Get-AzContext
 
+# Use Set AZ-Context -id "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxx" to set your context to the desired subscription
+
+#IP Address of the VM
+$hostVM =  
+
+#Name of the new NSG
+$nsgName =  
+
+#IP range of Bastion Subnet
+$bastionSubnet = 
+
+#Name of the Resource Group
 $rgName =  #Name of the Resource Group
 
-$location = "EastUS" #Location being deployed to
+#Location being deployed to
+$location = "EastUS" 
 
+#Rules established in baseline config. Excluding the deny rules 4095 and 4096 for now.
 $rule100 = New-AzNetworkSecurityRuleConfig -Name "AD-Ports-Inbound" `
     -Access Allow -Protocol * -Direction Inbound -Priority 100 -SourceAddressPrefix `
     10.21.70.4,10.21.70.5 -SourcePortRange * -DestinationAddressPrefix  $hostVM -DestinationPortRange 135,137,445
@@ -51,5 +65,6 @@ $rule170 = New-AzNetworkSecurityRuleConfig -Name "Chocolatey-Outbound" `
     -Access Allow -Protocol Tcp -Direction Outbound -Priority 170 -SourceAddressPrefix `
     $hostVM -SourcePortRange * -DestinationAddressPrefix 10.21.72.14 -DestinationPortRange 443
 
+#Creates the new NSG withthe above rules
 New-AzNetworkSecurityGroup -ResourceGroupName $rgName -Location $location -Name `
     $nsgName -SecurityRules $rule100,$rule101,$rule110,$rule120,$rule130,$rule140,$rule150,$rule170
